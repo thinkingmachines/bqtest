@@ -1,1 +1,1 @@
-from bqtest.bqtest import main
+from bqtest import main
