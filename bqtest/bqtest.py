@@ -22,7 +22,7 @@ def run_datatest(bq_path, private_key):
         return {'success': False, 'err_msg': err_msg}
     result = result.pop()
     test_passed = all(result[1])
-    failed_tests = [result]
+    failed_tests = [result[0] for r in result if not result[1]]
     # TODO: give more details on error thru err_msg
     print(dict(result.items()))
     return {'success': test_passed}
