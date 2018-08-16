@@ -17,14 +17,22 @@ from helpers.bq_helper import query_view
 
 def run_datatest(bq_path, private_key):
     result = query_view(bq_path, private_key, limit=2)
+
     if len(result) != 1:
         err_msg = "Data test result should only have one row."
+
         return {'success': False, 'err_msg': err_msg}
+
     result = result.pop()
-    test_passed = all(result[1])
-    failed_tests = [result[0] for r in result if not result[1]]
-    # TODO: give more details on error thru err_msg
-    print(dict(result.items()))
+    test_passed = all(result)
+
+    if not test_passed:
+        tests = dict(result.items())
+        failed_tests = [test[0] for test in tests.items() if not test[1]]
+        err_msg = "Failed in data tests: {}".format(', '.join(failed_tests))
+
+        return {'success': False, 'err_msg': err_msg}
+
     return {'success': test_passed}
 
 
@@ -38,6 +46,7 @@ def cli_print_result(result):
 def main():
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     args = docopt(__doc__)
+
     if args["datatest"]:
         result = run_datatest(bq_path=args['<bq_table>'], private_key=args['<private_key>'])
         cli_print_result(result)
