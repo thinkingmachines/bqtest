@@ -9,6 +9,7 @@ Arguments:
 
 import logging
 import sys
+from google.api_core.exceptions import GoogleAPIError
 
 from docopt import docopt
 
@@ -16,7 +17,10 @@ from bqtest.helpers.bq_helper import query_view
 
 
 def run_datatest(bq_path, private_key):
-    result = query_view(bq_path, private_key, limit=2)
+    try:
+        result = query_view(bq_path, private_key, limit=2)
+    except GoogleAPIError as e:
+        return {'success': False, 'err_msg': str(e)}
 
     if len(result) != 1:
         err_msg = "Data test result should only have one row."
