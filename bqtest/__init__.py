@@ -1,2 +1,2 @@
-from bqtest import main
-from bqtest import run_datatest
+from bqtest.bqtest import main
+from bqtest.bqtest import run_datatest

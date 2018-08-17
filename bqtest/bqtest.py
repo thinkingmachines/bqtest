@@ -12,7 +12,7 @@ import sys
 
 from docopt import docopt
 
-from helpers.bq_helper import query_view
+from bqtest.helpers.bq_helper import query_view
 
 
 def run_datatest(bq_path, private_key):
