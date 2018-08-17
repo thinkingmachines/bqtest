@@ -13,7 +13,7 @@ setup(name='bqtest',
           'google-cloud-bigquery'
       ],
       dependency_links=[],
-      packages=find_packages(),
+      packages=find_packages('bqtest'),
       zip_safe=False,
       entry_points={
           'console_scripts': [

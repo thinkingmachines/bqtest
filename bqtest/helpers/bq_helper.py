@@ -1,4 +1,5 @@
 import re
+import json
 
 from google.cloud import bigquery
 from google.oauth2 import service_account
@@ -41,14 +42,19 @@ def get_bq_client(bq_path=None, project=None, private_key=None):
     Creates the BigQuery Client object
     :param bq_path: the BigQuery path
     :param project: the project name. Optional if the project name is specified in the BigQuery path
-    :param private_key: the path to the private key. Uses the application default credentials if not passed.
+    :param private_key: the string contents of the private key, or the path to the private key.
+    Uses the application default credentials if not passed.
     :return:
     """
     path_project, _, _ = parse_bq_path(bq_path)
     if project is not None and project != path_project:
         raise ValueError('Conflicting project values: {} and {}'.format(bq_path, project))
     project = path_project
-    credentials = service_account.Credentials.from_service_account_file(private_key)
+    try:
+        key_dict = json.loads(private_key)
+        credentials = service_account.Credentials.from_service_account_info(key_dict)
+    except ValueError:
+        credentials = service_account.Credentials.from_service_account_file(private_key)
     return bigquery.Client(project=project, credentials=credentials)
 
 
