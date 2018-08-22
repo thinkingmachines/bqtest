@@ -9,42 +9,19 @@ Arguments:
 
 import logging
 import sys
-from google.api_core.exceptions import GoogleAPIError
 
 from docopt import docopt
 
-from bqtest.helpers.bq_helper import query_view
+from bqtest.data_tests import run_data_tests
 
 
-def run_datatest(bq_path, private_key):
-    try:
-        result = query_view(bq_path, private_key, limit=2)
-    except GoogleAPIError as e:
-        return {'success': False, 'err_msg': str(e)}
-
-    if len(result) != 1:
-        err_msg = "Data test result should only have one row."
-
-        return {'success': False, 'err_msg': err_msg}
-
-    result = result.pop()
-    test_passed = all(result)
-
-    if not test_passed:
-        tests = dict(result.items())
-        failed_tests = [test[0] for test in tests.items() if not test[1]]
-        err_msg = "Failed in data tests: {}".format(', '.join(failed_tests))
-
-        return {'success': False, 'err_msg': err_msg}
-
-    return {'success': test_passed}
-
-
-def cli_print_result(result):
-    if result['success']:
-        logging.info("Test passed")
-    else:
-        logging.info("Test failed. Reason: {}".format(result['err_msg']))
+def cli_print_result(results):
+    for result in results:
+        logging.info("Test name: {}".format(result['test_name']))
+        if result['success']:
+            logging.info("Result: PASS")
+        else:
+            logging.info("Result: FAIL. Reason: {}".format(result['err_msg']))
 
 
 def main():
@@ -52,7 +29,7 @@ def main():
     args = docopt(__doc__)
 
     if args["datatest"]:
-        result = run_datatest(bq_path=args['<bq_table>'], private_key=args['<private_key>'])
-        cli_print_result(result)
+        results = run_data_tests(bq_path=args['<bq_table>'], private_key=args['<private_key>'])
+        cli_print_result(results)
     else:
         raise NotImplementedError("That feature is not yet implemented.")

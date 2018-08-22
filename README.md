@@ -8,7 +8,7 @@ Specifically, it supports:
 ## Usage
 
 ```bash
-bqtest datatest cloversense-dashboard.data_tests.basic_wagers_data_tests secrets/key.json
+bqtest datatest cloversense-dashboard.data_tests secrets/key.json
 ```
 
 ## Development
